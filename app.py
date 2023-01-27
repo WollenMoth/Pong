@@ -24,13 +24,15 @@ pygame.display.set_caption("Pong")
 class Bar:
     COLOR = WHITE
     VEL = 5
+    WIDTH = BAR_WIDTH
+    HEIGHT = BAR_HEIGHT
 
     def __init__(self, x, y):
         self.x = x
         self.y = y
 
     def draw(self, screen):
-        rect = (self.x, self.y, BAR_WIDTH, BAR_HEIGHT)
+        rect = (self.x, self.y, self.WIDTH, self.HEIGHT)
         pygame.draw.rect(screen, self.COLOR, rect)
 
     def move(self, up=True):
