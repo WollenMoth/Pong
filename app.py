@@ -1,4 +1,5 @@
 import pygame
+import random
 
 WIDTH, HEIGHT = 800, 600
 
@@ -42,7 +43,32 @@ class Bar:
             self.y = min(self.y + self.VEL, HEIGHT - BAR_HEIGHT)
 
 
-def draw(screen: pygame.Surface, bars: tuple[Bar, ...]):
+class Ball:
+    COLOR = WHITE
+    RADIUS = 10
+    VEL_X = random.randint(-4, 4)
+    VEL_Y = random.randint(-4, 4)
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def draw(self, screen):
+        pygame.draw.circle(screen, self.COLOR, (self.x, self.y), self.RADIUS)
+
+    def move(self):
+        self.x += self.VEL_X
+        self.y += self.VEL_Y
+
+    def check(self, screen):
+        if (self.x - self.RADIUS <= 0 or self.x + self.RADIUS >= screen.get_width()):
+            self.VEL_X *= -1
+
+        if (self.y - self.RADIUS <= 0 or self.y + self.RADIUS >= screen.get_height()):
+            self.VEL_Y *= -1
+
+
+def draw(screen: pygame.Surface, bars: tuple[Bar, ...], ball: Ball):
     screen.fill(BLACK)
 
     for bar in bars:
@@ -57,6 +83,8 @@ def draw(screen: pygame.Surface, bars: tuple[Bar, ...]):
 
         rect = (line_center, i, LINE_WIDTH, line_step)
         pygame.draw.rect(screen, WHITE, rect)
+
+    ball.draw(screen)
 
     pygame.display.flip()
 
@@ -75,6 +103,11 @@ def handle_bar_movement(keys, bars: tuple[Bar, ...]):
         right_bar.move(up=False)
 
 
+def handle_ball_movement(screen, ball: Ball):
+    ball.move()
+    ball.check(screen)
+
+
 def main():
     running = True
     clock = pygame.time.Clock()
@@ -87,13 +120,18 @@ def main():
 
     bars = (left_bar, right_bar)
 
+    ball = Ball(WIDTH // 2, HEIGHT // 2)
+
     while running:
         clock.tick(FPS)
 
-        draw(screen, bars)
+        draw(screen, bars, ball)
 
         keys = pygame.key.get_pressed()
+
         handle_bar_movement(keys, bars)
+
+        handle_ball_movement(screen, ball)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
